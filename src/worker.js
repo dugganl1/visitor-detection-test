@@ -1,19 +1,14 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    console.log("Request path:", url.pathname); // Debug log
 
-    // Serve static files
-    if (!url.pathname.startsWith("/api/")) {
-      return env.ASSETS.fetch(request);
-    }
-
-    // Handle API requests
+    // Handle API requests first
     if (url.pathname === "/api/visitor-info") {
-      const ip = request.headers.get("cf-connecting-ip");
-      const country = request.headers.get("cf-ipcountry");
-
       try {
-        // Only attempt IPinfo request if we have an API token
+        const ip = request.headers.get("cf-connecting-ip");
+        const country = request.headers.get("cf-ipcountry");
+
         let companyData = null;
         if (env.IPINFO_TOKEN) {
           const response = await fetch(`https://ipinfo.io/${ip}/company?token=${env.IPINFO_TOKEN}`);
@@ -41,9 +36,7 @@ export default {
       } catch (error) {
         return new Response(
           JSON.stringify({
-            error: "Failed to fetch visitor information",
-            ip,
-            country,
+            error: error.message,
             timestamp: new Date().toISOString(),
           }),
           {
@@ -51,14 +44,13 @@ export default {
             headers: {
               "Content-Type": "application/json",
               "Access-Control-Allow-Origin": "*",
-              "Cache-Control": "no-store",
             },
           }
         );
       }
     }
 
-    // Handle unknown API routes
-    return new Response("Not Found", { status: 404 });
+    // Serve static files for all other requests
+    return env.ASSETS.fetch(request);
   },
 };
