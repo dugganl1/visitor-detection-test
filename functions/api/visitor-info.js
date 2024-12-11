@@ -2,34 +2,25 @@ export async function onRequest(context) {
   try {
     const url = new URL(context.request.url);
     const ip = url.searchParams.get("testip") || context.request.headers.get("cf-connecting-ip");
-    const country = context.request.headers.get("cf-ipcountry");
 
-    let companyData = null;
-    let ipinfoResponse = null;
-
+    let ipData = null;
     if (context.env.IPINFO_TOKEN) {
-      const response = await fetch(
-        `https://ipinfo.io/${ip}/company?token=${context.env.IPINFO_TOKEN}`
-      );
-      ipinfoResponse = await response.text(); // Get raw response
-
+      // Using basic IP lookup instead of company endpoint
+      const response = await fetch(`https://ipinfo.io/${ip}?token=${context.env.IPINFO_TOKEN}`);
       if (response.ok) {
-        try {
-          companyData = JSON.parse(ipinfoResponse);
-        } catch (e) {
-          companyData = null;
-        }
+        ipData = await response.json();
       }
     }
 
     return new Response(
       JSON.stringify({
-        ip,
-        country,
-        company: companyData,
-        ipinfoResponse, // Include raw response for debugging
-        timestamp: new Date().toISOString(),
-        userAgent: context.request.headers.get("user-agent"),
+        requestInfo: {
+          ip: ip,
+          country: context.request.headers.get("cf-ipcountry"),
+          userAgent: context.request.headers.get("user-agent"),
+          timestamp: new Date().toISOString(),
+        },
+        ipInfo: ipData,
       }),
       {
         headers: {
