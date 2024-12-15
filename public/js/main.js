@@ -4,7 +4,6 @@ function getCityFromTimezone() {
 }
 
 function updateTimeDisplay() {
-  // Get browser's local time and timezone
   const browserCity = getCityFromTimezone();
   const currentTime = new Date().toLocaleTimeString("en-GB", {
     hour: "2-digit",
@@ -13,18 +12,17 @@ function updateTimeDisplay() {
     hour12: false,
   });
 
-  // Fetch actual location from Cloudflare
   fetch("/api/visitor-info")
     .then((response) => response.json())
     .then((data) => {
       const resultHtml = `
                 <h3>Time Information:</h3>
                 <p>Browser Time: ${browserCity} ${currentTime}</p>
-                <p>Physical Location: ${data.countryName}</p>
+                <p>Physical Location: ${data.city}, ${data.countryName}</p>
                 ${
-                  browserCity.includes(data.countryName)
-                    ? ""
-                    : `<p>Note: Your browser timezone (${browserCity}) appears different from your location (${data.countryName})</p>`
+                  data.city && browserCity !== data.city
+                    ? `<p>Note: Your browser timezone (${browserCity}) appears different from your detected city (${data.city})</p>`
+                    : ""
                 }
             `;
       document.getElementById("result").innerHTML = resultHtml;

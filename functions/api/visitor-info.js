@@ -1,12 +1,15 @@
 export async function onRequest(context) {
   try {
-    const url = new URL(context.request.url);
-    const ip = url.searchParams.get("testip") || context.request.headers.get("cf-connecting-ip");
+    const ip = context.request.headers.get("cf-connecting-ip");
     const country = context.request.headers.get("cf-ipcountry");
+    const city = context.request.headers.get("cf-ipcity"); // Add this!
+    const region = context.request.headers.get("cf-region"); // Can add region too
 
     return new Response(
       JSON.stringify({
         ip: ip,
+        city: city,
+        region: region,
         country: country,
         countryName: new Intl.DisplayNames(["en"], { type: "region" }).of(country),
         timestamp: new Date().toISOString(),
