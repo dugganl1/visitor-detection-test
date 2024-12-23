@@ -6,18 +6,26 @@ export async function onRequest(context) {
 
     // Use test IP if provided, otherwise use real visitor IP
     const ip = testIp || context.request.headers.get("cf-connecting-ip");
-    const country = testIp ? null : context.request.headers.get("cf-ipcountry"); // We won't get Cloudflare headers for test IPs
+
+    // Only use Cloudflare headers if we're not testing
+    const country = testIp ? null : context.request.headers.get("cf-ipcountry");
+
+    console.log("Testing IP:", testIp); // Debug log
+    console.log("Using IP:", ip); // Debug log
 
     // Get IPinfo enrichment
     const ipinfoToken = context.env.IPINFO_TOKEN;
     const ipinfoResponse = await fetch(`https://ipinfo.io/${ip}?token=${ipinfoToken}`);
     const ipinfoData = await ipinfoResponse.json();
 
+    console.log("IPinfo response:", ipinfoData); // Debug log
+
     return new Response(
       JSON.stringify({
         isTest: !!testIp,
+        testIp: testIp, // Added for debugging
         ip: ip,
-        country: country,
+        country: ipinfoData.country, // Use IPinfo's country when testing
         countryName: ipinfoData.country
           ? new Intl.DisplayNames(["en"], { type: "region" }).of(ipinfoData.country)
           : null,
@@ -25,7 +33,6 @@ export async function onRequest(context) {
         org: ipinfoData.org,
         asn: ipinfoData.asn,
         privacy: ipinfoData.privacy,
-        // Add raw IPinfo response for debugging
         raw: ipinfoData,
       }),
       {
@@ -37,9 +44,15 @@ export async function onRequest(context) {
       }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        stack: error.stack, // Added for debugging
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      }
+    );
   }
 }
