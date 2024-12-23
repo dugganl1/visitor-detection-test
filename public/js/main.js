@@ -40,4 +40,7 @@ ${JSON.stringify(data.raw, null, 2)}
     });
 }
 
-displayVisitorInfo();
+displayVisitorInfo().then(() => {
+  displayTrackingInfo();
+  displaySessionInfo();
+});
