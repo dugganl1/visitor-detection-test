@@ -18,19 +18,26 @@ function displayVisitorInfo() {
         <p>Timezone: ${data.raw.timezone || "Unknown"}</p>
         <p>Location: ${data.raw.loc || "Unknown"}</p>
         <p>Postal Code: ${data.raw.postal || "Unknown"}</p>
-
         ${
           data.isTest
             ? `
           <h3>Raw IPinfo Data:</h3>
-          <pre style="background-color: #f5f5f5; padding: 10px; overflow-x: auto;">
+          <pre style="background-color: white; padding: 10px; overflow-x: auto;">
 ${JSON.stringify(data.raw, null, 2)}
           </pre>
         `
             : ""
         }
       `;
+
+      // Start with IP info
       document.getElementById("result").innerHTML = resultHtml;
+
+      // Add cookie tracking info
+      displayTrackingInfo();
+
+      // Add session tracking info
+      displaySessionInfo();
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -40,7 +47,4 @@ ${JSON.stringify(data.raw, null, 2)}
     });
 }
 
-displayVisitorInfo().then(() => {
-  displayTrackingInfo();
-  displaySessionInfo();
-});
+displayVisitorInfo();
