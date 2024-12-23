@@ -1,6 +1,12 @@
 // In main.js
 let visitorData = null; // Store the Cloudflare data
 
+function getCountryFromTimezone() {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Get the first part of timezone which is usually the continent/country
+  return timezone.split("/")[0];
+}
+
 function updateTimeDisplay() {
   const currentTime = new Date().toLocaleTimeString("en-GB", {
     hour: "2-digit",
