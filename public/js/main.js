@@ -1,12 +1,7 @@
 function displayVisitorInfo() {
-  // Get the current URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const testIp = urlParams.get("ip");
-
-  // Build the API URL with the test IP if present
   const apiUrl = testIp ? `/api/visitor-info?ip=${testIp}` : "/api/visitor-info";
-
-  console.log("Fetching from:", apiUrl);
 
   fetch(apiUrl)
     .then((response) => response.json())
@@ -15,16 +10,14 @@ function displayVisitorInfo() {
       const resultHtml = `
         <h3>IP Analytics:</h3>
         <p>IP Address: ${data.ip}</p>
+        <p>Hostname: ${data.raw.hostname || "Unknown"}</p>
         <p>Country: ${data.countryName || "Unknown"}</p>
-        <p>Network: ${data.org || "Unknown"}</p>
-        <p>ASN Details: ${data.asn ? `${data.asn.asn} (${data.asn.name})` : "Unknown"}</p>
-        <p>Network Type: ${data.asn?.type || "Unknown"}</p>
-        <p>Network Route: ${data.asn?.route || "Unknown"}</p>
-        <p>Company Domain: ${data.asn?.domain || "Unknown"}</p>
-        ${data.privacy?.vpn ? "<p><strong>VPN Detected</strong></p>" : ""}
-        ${data.privacy?.proxy ? "<p><strong>Proxy Detected</strong></p>" : ""}
-        ${data.privacy?.tor ? "<p><strong>Tor Detected</strong></p>" : ""}
-        ${data.privacy?.hosting ? "<p><strong>Hosting/Datacenter Detected</strong></p>" : ""}
+        <p>City: ${data.raw.city || "Unknown"}</p>
+        <p>Region: ${data.raw.region || "Unknown"}</p>
+        <p>Network Organization: ${data.raw.org || "Unknown"}</p>
+        <p>Timezone: ${data.raw.timezone || "Unknown"}</p>
+        <p>Location: ${data.raw.loc || "Unknown"}</p>
+        <p>Postal Code: ${data.raw.postal || "Unknown"}</p>
 
         ${
           data.isTest
