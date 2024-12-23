@@ -57,15 +57,29 @@ function trackVisit() {
 // Display tracking information
 function displayTrackingInfo() {
   const visitorInfo = trackVisit();
+  const sourceInfo = trackSource(); // Add this line
+
   const resultHtml = `
         <h3>Cookie Tracking Info:</h3>
         <p>Visitor ID: ${visitorInfo.visitorId}</p>
         <p>Visit Count: ${visitorInfo.visitCount}</p>
         <p>First Visit: ${new Date(visitorInfo.firstVisit).toLocaleString()}</p>
         <p>Last Visit: ${new Date(visitorInfo.lastVisit).toLocaleString()}</p>
+        
+        <h3>Attribution Info:</h3>
+        <p>Initial Source: ${sourceInfo.initialSource}</p>
+        <p>Current Referrer: ${sourceInfo.referrer || "Direct"}</p>
+        ${
+          sourceInfo.source
+            ? `
+        <p>Campaign Source: ${sourceInfo.source}</p>
+        <p>Campaign Medium: ${sourceInfo.medium || "Not Set"}</p>
+        <p>Campaign Name: ${sourceInfo.campaign || "Not Set"}</p>
+        `
+            : ""
+        }
     `;
 
-  // Add this to your existing result div
   const resultDiv = document.getElementById("result");
   resultDiv.innerHTML += resultHtml;
 }
