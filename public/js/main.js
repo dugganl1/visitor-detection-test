@@ -1,8 +1,17 @@
-// main.js
 function displayVisitorInfo() {
-  fetch("/api/visitor-info")
+  // Get the current URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const testIp = urlParams.get("ip");
+
+  // Build the API URL with the test IP if present
+  const apiUrl = testIp ? `/api/visitor-info?ip=${testIp}` : "/api/visitor-info";
+
+  console.log("Fetching from:", apiUrl);
+
+  fetch(apiUrl)
     .then((response) => response.json())
     .then((data) => {
+      console.log("Received data:", data);
       const resultHtml = `
         <h3>IP Analytics:</h3>
         <p>IP Address: ${data.ip}</p>
@@ -31,11 +40,11 @@ ${JSON.stringify(data.raw, null, 2)}
       document.getElementById("result").innerHTML = resultHtml;
     })
     .catch((error) => {
+      console.error("Error:", error);
       document.getElementById(
         "result"
       ).innerHTML = `Error loading visitor information: ${error.message}`;
     });
 }
 
-// Single API call on page load
 displayVisitorInfo();
