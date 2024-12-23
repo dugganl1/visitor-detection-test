@@ -1,8 +1,12 @@
 export async function onRequest(context) {
   try {
-    // Get basic Cloudflare data
-    const ip = context.request.headers.get("cf-connecting-ip");
-    const country = context.request.headers.get("cf-ipcountry");
+    // Check if there's a test IP in the URL
+    const url = new URL(context.request.url);
+    const testIp = url.searchParams.get("ip");
+
+    // Use test IP if provided, otherwise use real visitor IP
+    const ip = testIp || context.request.headers.get("cf-connecting-ip");
+    const country = testIp ? null : context.request.headers.get("cf-ipcountry"); // We won't get Cloudflare headers for test IPs
 
     // Get IPinfo enrichment
     const ipinfoToken = context.env.IPINFO_TOKEN;
@@ -11,13 +15,18 @@ export async function onRequest(context) {
 
     return new Response(
       JSON.stringify({
+        isTest: !!testIp,
         ip: ip,
         country: country,
-        countryName: country ? new Intl.DisplayNames(["en"], { type: "region" }).of(country) : null,
+        countryName: ipinfoData.country
+          ? new Intl.DisplayNames(["en"], { type: "region" }).of(ipinfoData.country)
+          : null,
         hostname: ipinfoData.hostname,
         org: ipinfoData.org,
         asn: ipinfoData.asn,
         privacy: ipinfoData.privacy,
+        // Add raw IPinfo response for debugging
+        raw: ipinfoData,
       }),
       {
         headers: {

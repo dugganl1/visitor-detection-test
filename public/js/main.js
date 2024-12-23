@@ -1,3 +1,4 @@
+// main.js
 function displayVisitorInfo() {
   fetch("/api/visitor-info")
     .then((response) => response.json())
@@ -15,6 +16,17 @@ function displayVisitorInfo() {
         ${data.privacy?.proxy ? "<p><strong>Proxy Detected</strong></p>" : ""}
         ${data.privacy?.tor ? "<p><strong>Tor Detected</strong></p>" : ""}
         ${data.privacy?.hosting ? "<p><strong>Hosting/Datacenter Detected</strong></p>" : ""}
+
+        ${
+          data.isTest
+            ? `
+          <h3>Raw IPinfo Data:</h3>
+          <pre style="background-color: #f5f5f5; padding: 10px; overflow-x: auto;">
+${JSON.stringify(data.raw, null, 2)}
+          </pre>
+        `
+            : ""
+        }
       `;
       document.getElementById("result").innerHTML = resultHtml;
     })
