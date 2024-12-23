@@ -5,15 +5,30 @@
     <title>IP Detection Test</title>
     <link
       rel="stylesheet"
-      href="/css/styles.css"
+      href="css/styles.css"
     />
   </head>
   <body>
     <h1>This is an experiment - thank you for participating!</h1>
+
+    <div class="form-container">
+      <h2>Download Our eBook</h2>
+      <form id="ebook-form">
+        <input
+          type="email"
+          id="email"
+          placeholder="Enter your email"
+          required
+        />
+        <button type="submit">Get the eBook</button>
+      </form>
+    </div>
+
     <div id="result">Loading visitor information...</div>
 
-    <script src="/js/cookie-tracker.js"></script>
-    <script src="/js/session-tracker.js"></script>
-    <script src="/js/main.js"></script>
+    <script src="js/cookie-tracker.js"></script>
+    <script src="js/session-tracker.js"></script>
+    <script src="js/identified-visitor.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>
