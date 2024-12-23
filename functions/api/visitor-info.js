@@ -1,24 +1,11 @@
 export async function onRequest(context) {
   try {
-    // Get all available Cloudflare headers for geolocation
-    const headers = {
-      ip: context.request.headers.get("cf-connecting-ip"),
-      city: context.request.headers.get("cf-ipcity"),
-      region: context.request.headers.get("cf-region"),
-      country: context.request.headers.get("cf-ipcountry"),
-      // Let's also get these additional headers
-      latitude: context.request.headers.get("cf-iplatitude"),
-      longitude: context.request.headers.get("cf-iplongitude"),
-      continent: context.request.headers.get("cf-ipcontinent"),
-      timezone: context.request.headers.get("cf-timezone"),
-    };
+    const country = context.request.headers.get("cf-ipcountry");
 
     return new Response(
       JSON.stringify({
-        ...headers,
-        countryName: headers.country
-          ? new Intl.DisplayNames(["en"], { type: "region" }).of(headers.country)
-          : null,
+        country: country,
+        countryName: country ? new Intl.DisplayNames(["en"], { type: "region" }).of(country) : null,
         timestamp: new Date().toISOString(),
       }),
       {
@@ -30,6 +17,18 @@ export async function onRequest(context) {
       }
     );
   } catch (error) {
-    // ... error handling
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
   }
 }

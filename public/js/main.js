@@ -1,10 +1,11 @@
-function getCityFromTimezone() {
+function getCountryFromTimezone() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return timezone.split("/").pop().replace(/_/g, " ");
+  // Get the first part of timezone which is usually the continent/country
+  return timezone.split("/")[0];
 }
 
 function updateTimeDisplay() {
-  const browserCity = getCityFromTimezone();
+  const browserCountry = getCountryFromTimezone();
   const currentTime = new Date().toLocaleTimeString("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
@@ -16,25 +17,13 @@ function updateTimeDisplay() {
     .then((response) => response.json())
     .then((data) => {
       const resultHtml = `
-        <h3>Browser Information:</h3>
-        <p>Browser Time: ${browserCity} ${currentTime}</p>
-        
-        <h3>Cloudflare Detection:</h3>
-        <ul>
-          <li>IP Address: ${data.ip || "Not detected"}</li>
-          <li>City: ${data.city || "Not detected"}</li>
-          <li>Region: ${data.region || "Not detected"}</li>
-          <li>Country: ${data.countryName || "Not detected"} (${data.country || "N/A"})</li>
-          <li>Continent: ${data.continent || "Not detected"}</li>
-          <li>Coordinates: ${
-            data.latitude ? `${data.latitude}, ${data.longitude}` : "Not detected"
-          }</li>
-          <li>Timezone: ${data.timezone || "Not detected"}</li>
-        </ul>
-
+        <h3>Time Information:</h3>
+        <p>Browser Time: ${currentTime}</p>
+        <p>Browser Location: ${browserCountry}</p>
+        <p>Physical Location: ${data.countryName || "Unknown"}</p>
         ${
-          data.city && browserCity !== data.city
-            ? `<p class="note">Note: Your browser timezone (${browserCity}) appears different from your detected city (${data.city})</p>`
+          data.countryName && browserCountry !== data.countryName
+            ? `<p>Note: Your browser location (${browserCountry}) appears different from your detected country (${data.countryName})</p>`
             : ""
         }
       `;
