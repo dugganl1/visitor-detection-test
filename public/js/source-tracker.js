@@ -1,3 +1,4 @@
+// source-tracker.js
 function trackSource() {
   const referrer = document.referrer;
   const source = getCookie("initial_source") || referrer;

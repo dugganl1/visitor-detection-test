@@ -1,35 +1,10 @@
 // cookie-tracker.js
-function setCookie(name, value, daysToExpire) {
-  const date = new Date();
-  date.setDate(date.getDate() + daysToExpire);
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = `${name}=${value};${expires};path=/`;
-  console.log(`Cookie set: ${name}=${value}`); // Add this line
-}
-
-function getCookie(name) {
-  const cookieName = name + "=";
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const cookieArray = decodedCookie.split(";");
-
-  for (let cookie of cookieArray) {
-    while (cookie.charAt(0) === " ") {
-      cookie = cookie.substring(1);
-    }
-    if (cookie.indexOf(cookieName) === 0) {
-      return cookie.substring(cookieName.length, cookie.length);
-    }
-  }
-  return "";
-}
-
-// Track visitor information
 function trackVisit() {
   // Get or create visitor ID
   let visitorId = getCookie("visitor_id");
   if (!visitorId) {
     visitorId = "v_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-    setCookie("visitor_id", visitorId, 365); // Cookie expires in 1 year
+    setCookie("visitor_id", visitorId, 365);
   }
 
   // Track visit count
@@ -54,10 +29,9 @@ function trackVisit() {
   };
 }
 
-// Display tracking information
 function displayTrackingInfo() {
   const visitorInfo = trackVisit();
-  const sourceInfo = trackSource(); // Add this line
+  const sourceInfo = trackSource();
 
   const resultHtml = `
         <h3>Cookie Tracking Info:</h3>
