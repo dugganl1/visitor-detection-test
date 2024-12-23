@@ -1,12 +1,14 @@
 // source-tracker.js
 function trackSource() {
   const referrer = document.referrer;
-  const source = getCookie("initial_source") || referrer;
 
-  // Only set initial source for new visitors
-  if (!getCookie("initial_source")) {
-    setCookie("initial_source", source, 365);
+  // Only set initial source if it's the first visit ever
+  if (!getCookie("initial_source") && !getCookie("first_visit")) {
+    setCookie("initial_source", referrer || "Direct", 365);
   }
+
+  // Get the stored initial source
+  const initialSource = getCookie("initial_source") || "Direct";
 
   // UTM tracking
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,8 +26,8 @@ function trackSource() {
   }
 
   return {
-    referrer,
-    initialSource: source || "Direct",
+    initialSource,
+    currentReferrer: referrer || "Direct",
     ...utmParams,
   };
 }

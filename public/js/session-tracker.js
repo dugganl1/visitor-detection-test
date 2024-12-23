@@ -6,7 +6,8 @@ function trackPageView() {
 
   if (!sessionId) {
     sessionId = "s_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-    sessionStart = new Date().toISOString();
+    sessionStart = new Date().toISOString(); // This is correct
+    // These cookies should be session cookies (no expiry date)
     setCookie("session_id", sessionId);
     setCookie("session_start", sessionStart);
   }
@@ -19,7 +20,7 @@ function trackPageView() {
 
   return {
     sessionId,
-    sessionStart,
+    sessionStart: sessionStart || new Date().toISOString(), // Add fallback
     pagesViewed: pagesViewed.split(","),
   };
 }
@@ -29,7 +30,11 @@ function displaySessionInfo() {
   const resultHtml = `
         <h3>Session Tracking Info:</h3>
         <p>Session ID: ${sessionInfo.sessionId}</p>
-        <p>Session Started: ${new Date(sessionInfo.sessionStart).toLocaleString()}</p>
+        <p>Session Started: ${
+          sessionInfo.sessionStart
+            ? new Date(sessionInfo.sessionStart).toLocaleString()
+            : "Just now"
+        }</p>
         <p>Pages Viewed This Session: ${sessionInfo.pagesViewed.length}</p>
         <p>Navigation Path: ${sessionInfo.pagesViewed.join(" → ")}</p>
     `;
